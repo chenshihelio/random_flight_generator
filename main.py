@@ -35,7 +35,12 @@ def calculate():
     min_distance = int(entry1.get())
     max_distance = int(entry2.get())
 
-    if max_distance<=min_distance:
+    if min_distance*nm_to_km>=earth_radius*np.pi:
+        result_label.config(text="Minimum distance is too large!! Input a new value.")
+        return
+
+
+    if max_distance<min_distance:
         print('Maximum distance should be larger than minimum distance!! Swapping them...')
         tmp = max_distance
         max_distance = min_distance
@@ -47,9 +52,32 @@ def calculate():
         entry2.delete(0, tk.END)
         entry2.insert(0,'{:d}'.format(int(max_distance)))
 
-    success = False 
 
+    if min_distance*nm_to_km>=earth_radius*np.pi:
+        result_label.config(text="Minimum distance is too large!! Input a new value.")
+        for i in tree1.get_children():
+            tree1.delete(i)
+
+        for i in tree2.get_children():
+            tree2.delete(i)
+        return
+
+
+    success = False 
+    num_try = 0
     while success==False:
+        if num_try>100:
+            result_label.config(text="Fail to find a result!!!")
+
+            for i in tree1.get_children():
+                tree1.delete(i)
+
+            for i in tree2.get_children():
+                tree2.delete(i)
+
+            return
+        
+        num_try = num_try + 1
         # read data
         data_medium = pd.read_csv('./airport_medium.csv')
         data_large = pd.read_csv('./airport_large.csv')
@@ -87,7 +115,9 @@ def calculate():
 
         # extract airports that fall into the distance range
         data_sub = data.loc[(data['distance']>=min_distance) & (data['distance']<=max_distance)].reset_index()
+        data_sub.drop(data_sub.loc[data_sub['ident'] == airport0['ident']].index, inplace=True)
 
+        data_sub.reset_index()
         if len(data_sub)==0:
             continue
 
@@ -118,12 +148,12 @@ def calculate():
         
 
     tree1.insert("", "end", values=(airport0['gps_code']))
-    tree1.insert("", "end", values=(airport0['name']))
+    tree1.insert("", "end", values=(airport0['name'],""))
     tree1.insert("", "end", values=('{:.3f}'.format(float(airport0['latitude_deg']))))
     tree1.insert("", "end", values=('{:.3f}'.format(float(airport0['longitude_deg']))))
 
     tree2.insert("", "end", values=(airport1['gps_code']))
-    tree2.insert("", "end", values=(airport1['name']))
+    tree2.insert("", "end", values=(airport1['name'],""))
     tree2.insert("", "end", values=('{:.3f}'.format(float(airport1['latitude_deg']))))
     tree2.insert("", "end", values=('{:.3f}'.format(float(airport1['longitude_deg']))))
 
