@@ -145,7 +145,6 @@ def calculate():
 
             # find the airport closest to this random location 
             ind0 = distance.argmin()
-            print('ind0 = ', ind0)
             airport0 = data.loc[ind0]
 
         # get latitude and longitude of airport0
