@@ -132,9 +132,9 @@ def calculate():
             # print('Random a spatial location and then find airports...')
 
             # generate a random number
-            lat_min = data['latitude_deg'].min()
-            lat_max = data['latitude_deg'].max()
-            lat_rand = random.uniform(lat_min-2,lat_max+2) * np.pi/180
+            lat_min = max(data['latitude_deg'].min()-2,-89.99)
+            lat_max = min(data['latitude_deg'].max()+2, 89.99)
+            lat_rand = random.uniform(lat_min,lat_max) * np.pi/180
             lon_rand = random.uniform(-180,180) * np.pi/180
 
             # calculate distances to this random location
